@@ -7,7 +7,7 @@ import datetime
 from typing import List, Optional
 import bcrypt
 from flask import current_app, request
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, CheckConstraint
 
 from .. import db
 from ..sync.utils import get_user_agent, get_ip, get_device_id
@@ -35,6 +35,7 @@ class User(db.Model):
     __table_args__ = (
         db.Index("ix_user_username", func.lower(username), unique=True),
         db.Index("ix_user_email", func.lower(email), unique=True),
+        CheckConstraint("email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$'", name="email_format"),
     )
 
     def __init__(self, username, email, passwd, is_admin=False):
