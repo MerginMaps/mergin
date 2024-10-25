@@ -66,7 +66,9 @@ class RegisterUserForm(FlaskForm):
         if not super().validate():
             return False
         if not is_email_address_valid(self.email.data):
-            self.email.errors.append("Email address contains non-ASCII characters. Only ASCII emails are allowed.")
+            self.email.errors.append(
+                "Email address contains non-ASCII characters. Only ASCII emails are allowed."
+            )
             return False
 
         user = User.query.filter(

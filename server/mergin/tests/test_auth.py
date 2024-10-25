@@ -124,7 +124,12 @@ test_user_reg_data = [
         400,
     ),  # tests with upper case, but email already exists
     ("XmerginX", " mergin@mergin.com  ", "#pwd123", 400),  # invalid password
-    ("mergin4", "invalid\360@email.com", "#pwd1234", 400),  # non-ascii character in the email
+    (
+        "mergin4",
+        "invalid\360@email.com",
+        "#pwd1234",
+        400,
+    ),  # non-ascii character in the email
 ]
 
 
@@ -771,6 +776,7 @@ user_data = [
     ("user\360", False),  # non-ascii character
     ("user\\", False),  # disallowed character
 ]
+
 
 @pytest.mark.parametrize("username,success", user_data)
 def test_user_email_db_constraint(client, username, success):
