@@ -17,6 +17,7 @@ from wtforms.validators import (
 
 from .models import User
 from ..app import UpdateForm, CustomStringField
+from .utils import is_email_address_valid
 
 
 def username_validation(form, field):
@@ -63,6 +64,11 @@ class RegisterUserForm(FlaskForm):
 
     def validate(self):
         if not super().validate():
+            return False
+        if not is_email_address_valid(self.email.data):
+            self.email.errors.append(
+                "Email address contains non-ASCII characters. Only ASCII emails are allowed."
+            )
             return False
 
         user = User.query.filter(

@@ -8,6 +8,7 @@ import json
 from flask import url_for
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy import desc
+from sqlalchemy.exc import IntegrityError
 from unittest.mock import patch
 
 from ..auth.models import User, UserProfile, LoginHistory
@@ -123,6 +124,12 @@ test_user_reg_data = [
         400,
     ),  # tests with upper case, but email already exists
     ("XmerginX", " mergin@mergin.com  ", "#pwd123", 400),  # invalid password
+    (
+        "mergin4",
+        "invalid\360@email.com",
+        "#pwd1234",
+        400,
+    ),  # non-ascii character in the email
 ]
 
 
@@ -762,3 +769,20 @@ def test_update_project_v2(client):
     login_as_admin(client)
     resp = client.patch(f"v2/projects/{project.id}", json=data)
     assert resp.status_code == 204
+
+
+user_data = [
+    ("user1", True),  # no problem
+    ("user\360", False),  # non-ascii character
+    ("user\\", False),  # disallowed character
+]
+
+
+@pytest.mark.parametrize("username,success", user_data)
+def test_user_email_db_constraint(client, username, success):
+    if success:
+        add_user(username=username)
+    else:
+        with pytest.raises(IntegrityError):
+            add_user(username=username)
+    db.session.rollback()

@@ -36,8 +36,6 @@ from .forms import (
     ApiLoginForm,
 )
 from .. import db
-from ..app import DEPRECATION_API_MSG
-from ..utils import format_time_delta
 
 
 # public endpoints
