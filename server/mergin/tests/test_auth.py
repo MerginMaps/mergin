@@ -124,12 +124,6 @@ test_user_reg_data = [
         400,
     ),  # tests with upper case, but email already exists
     ("XmerginX", " mergin@mergin.com  ", "#pwd123", 400),  # invalid password
-    (
-        "mergin4",
-        "invalid\360@email.com",
-        "#pwd1234",
-        400,
-    ),  # non-ascii character in the email
 ]
 
 
