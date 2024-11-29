@@ -771,16 +771,6 @@ def test_update_project_v2(client):
     assert resp.status_code == 204
 
 
-#  Due to Python's internal handling of strings which is inherently Unicode we need to decode the string in the test
-user_data = [
-    ("user1".encode("utf-8"), 201),  # no problem
-    ("user\260".encode("utf-8"), 201),  # non-ascii character
-    ("usér".encode("utf-8"), 201),  # non-ascii character
-    ("user\\".encode("utf-8"), 400),  # disallowed character
-    ("日人日本人".encode("utf-8"), 201),  # non-ascii character
-    ("café".encode("latin1"), 400),  # not utf-8 encoding
-]
-
 user_data = [
     ("user1", True, 201),  # no problem
     ("user\260", True, 201),  # non-ascii character
