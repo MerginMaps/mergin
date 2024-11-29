@@ -771,18 +771,41 @@ def test_update_project_v2(client):
     assert resp.status_code == 204
 
 
+#  Due to Python's internal handling of strings which is inherently Unicode we need to decode the string in the test
 user_data = [
-    ("user1", True),  # no problem
-    ("user\360", False),  # non-ascii character
-    ("user\\", False),  # disallowed character
+    ("user1".encode("utf-8"), 201),  # no problem
+    ("user\260".encode("utf-8"), 201),  # non-ascii character
+    ("usér".encode("utf-8"), 201),  # non-ascii character
+    ("user\\".encode("utf-8"), 400),  # disallowed character
+    ("日人日本人".encode("utf-8"), 201),  # non-ascii character
+    ("café".encode("latin1"), 400),  # not utf-8 encoding
+]
+
+user_data = [
+    ("user1", True, 201),  # no problem
+    ("user\260", True, 201),  # non-ascii character
+    ("usér", True, 201),  # non-ascii character
+    ("user\\", True, 400),  # disallowed character
+    ("日人日本人", True, 201),  # non-ascii character
+    ("usér", False, 400),  # not utf-8 encoding
+    ("us er", True, 400),  # whitespace
+    ("us—er", True, 400),  # dash
 ]
 
 
-@pytest.mark.parametrize("username,success", user_data)
-def test_user_email_db_constraint(client, username, success):
-    if success:
-        add_user(username=username)
-    else:
-        with pytest.raises(IntegrityError):
-            add_user(username=username)
-    db.session.rollback()
+@pytest.mark.parametrize("username,utf8,expected", user_data)
+def test_user_email_format(client, username, expected, utf8):
+    login_as_admin(client)
+    email = username + "@example.com"
+    if not utf8:
+        # simulate server misinterpreting the input encoding
+        email = email.encode("latin1").decode("utf-8", errors="replace")
+    url = url_for("/.mergin_auth_controller_register_user")
+    data = {
+        "username": username,
+        "email": email,
+        "password": "#pwd1234",
+        "confirm": "#pwd1234",
+    }
+    resp = client.post(url, data=json.dumps(data), headers=json_headers)
+    assert resp.status_code == expected

@@ -17,7 +17,7 @@ from wtforms.validators import (
 
 from .models import User
 from ..app import UpdateForm, CustomStringField
-from .utils import is_email_address_valid
+from .utils import is_utf8, contains_email_invalid_characters
 
 
 def username_validation(form, field):
@@ -28,6 +28,11 @@ def username_validation(form, field):
             f"Please don't start username with . and "
             f"use only alphanumeric or these -._! characters in {field.name}."
         )
+
+
+def email_format(form, field):
+    if contains_email_invalid_characters(field.data) or not is_utf8(field.data):
+        raise ValidationError("Email address contains invalid characters.")
 
 
 class PasswordValidator:
@@ -59,16 +64,11 @@ class RegisterUserForm(FlaskForm):
     )
     email = CustomStringField(
         "Email Address",
-        validators=[DataRequired(), Email()],
+        validators=[DataRequired(), Email(), email_format],
     )
 
     def validate(self):
         if not super().validate():
-            return False
-        if not is_email_address_valid(self.email.data):
-            self.email.errors.append(
-                "Email address contains non-ASCII characters. Only ASCII emails are allowed."
-            )
             return False
 
         user = User.query.filter(
@@ -87,7 +87,7 @@ class RegisterUserForm(FlaskForm):
 class ResetPasswordForm(FlaskForm):
     email = CustomStringField(
         "Email Address",
-        [DataRequired(), Email()],
+        [DataRequired(), Email(), email_format],
     )
 
 
@@ -122,7 +122,7 @@ class UserProfileDataForm(UpdateForm):
     receive_notifications = BooleanField("Receive notifications", [Optional()])
     first_name = CustomStringField("First Name", [Optional()])
     last_name = CustomStringField("Last Name", [Optional()])
-    email = CustomStringField("Email", [Optional(), Email()])
+    email = CustomStringField("Email", [Optional(), Email(), email_format])
 
 
 class ApiLoginForm(LoginForm):

@@ -5,7 +5,16 @@
 import re
 
 
-def is_email_address_valid(email: str) -> bool:
-    """Check if email address contains only ASCII characters and basic email address requirements"""
-    email_ascii = r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$"
-    return re.match(email_ascii, email) is not None
+def contains_email_invalid_characters(email: str) -> bool:
+    """Check for invalid characters for the email address"""
+    invalid_characters = r"[ ;:’\–\—|,]"
+    return bool(re.search(invalid_characters, email))
+
+
+def is_utf8(text: str) -> bool:
+    """Check if given text is in UTF-8 encoding"""
+    try:
+        text.encode("utf-8").decode("utf-8")
+        return "�" not in text
+    except UnicodeDecodeError:
+        return False

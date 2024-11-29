@@ -35,10 +35,6 @@ class User(db.Model):
     __table_args__ = (
         db.Index("ix_user_username", func.lower(username), unique=True),
         db.Index("ix_user_email", func.lower(email), unique=True),
-        CheckConstraint(
-            "email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$'",
-            name="email_format",
-        ),
     )
 
     def __init__(self, username, email, passwd, is_admin=False):
