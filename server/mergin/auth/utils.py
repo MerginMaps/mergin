@@ -18,3 +18,7 @@ def is_utf8(text: str) -> bool:
         return "�" not in text
     except UnicodeDecodeError:
         return False
+
+
+def is_valid_email(email: str) -> bool:
+    return not contains_email_invalid_characters(email) and is_utf8(email)
