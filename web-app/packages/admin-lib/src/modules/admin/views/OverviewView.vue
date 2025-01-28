@@ -59,6 +59,7 @@ SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-MerginMaps-Commercial
           >
           <template #footer>
             <PButton
+              severity="secondary"
               @click="$router.push({ name: AdminRoutes.ACCOUNTS })"
               class="w-full"
               label="Manage users"
@@ -80,6 +81,7 @@ SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-MerginMaps-Commercial
           >
           <template #footer>
             <PButton
+              severity="secondary"
               @click="$router.push({ name: AdminRoutes.PROJECTS })"
               class="w-full"
               label="Manage projects"
@@ -101,6 +103,7 @@ SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-MerginMaps-Commercial
           >
           <template #footer>
             <PButton
+              severity="secondary"
               @click="$router.push({ name: 'adminWorkspaces' })"
               class="w-full"
               label="Manage workspaces"
